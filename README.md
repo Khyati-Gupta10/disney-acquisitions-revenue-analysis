@@ -8,13 +8,13 @@
 
 ## Abstract
 
-This project builds a small relational SQL database of Disney's major acquisitions and annual consolidated revenue, then uses validation checks and analytical queries (window functions, CTEs) to explore year-over-year revenue growth alongside the timing of landmark deals (e.g., Pixar, Marvel, Capital Cities/ABC, 21st Century Fox). It is intended as a demonstration of SQL technique — data modeling, validation, and window-function analysis — rather than a causal study of M&A performance.
+This project builds a small relational SQL database of Disney's major acquisitions and annual consolidated revenue, then uses validation checks and analytical queries (window functions, CTEs) to explore year over year revenue growth alongside the timing of landmark deals (e.g., Pixar, Marvel, Capital Cities/ABC, 21st Century Fox). It is intended as a demonstration of SQL technique ,data modeling, validation, and window-function analysis rather than a causal study of M&A performance.
 
 ---
 
 ## 1. Introduction
 
-Mergers and acquisitions (M&A) are often cited as pivotal moments in corporate strategy. Disney's history — from its early Disneyland ownership consolidation in the late 1950s to the $71.3 billion acquisition of 21st Century Fox in 2019 — offers a well-known case study. This project uses SQL to:
+Mergers and acquisitions (M&A) are often cited as pivotal moments in corporate strategy. Disney's history  from its early Disneyland ownership consolidation in the late 1950s to the $71.3 billion acquisition of 21st Century Fox in 2019 offers a well-known case study. This project uses SQL to:
 
 1. Catalogue Disney's major acquisitions.
 2. Track annual revenue over the 2009–2024 window for which comparable figures exist.
@@ -27,7 +27,7 @@ Mergers and acquisitions (M&A) are often cited as pivotal moments in corporate s
 ## 2. Literature Review
 
 - **Corporate M&A Performance**: Large-scale acquisitions can yield both synergies and integration risks (Capron & Mitchell, 2009).
-- **Disney's Strategic Growth**: Disney's IP-driven acquisitions — Pixar (2006), Marvel (2009), Lucasfilm (2012) — are widely discussed as a content-strategy pattern (Johnson, 2018).
+- **Disney's Strategic Growth**: Disney's IP-driven acquisitions Pixar (2006), Marvel (2009), Lucasfilm (2012) are widely discussed as a content-strategy pattern (Johnson, 2018).
 - **SQL in Business Research**: SQL is a practical tool for managing and querying longitudinal financial data (Kim et al., 2020).
 
 ---
@@ -36,7 +36,7 @@ Mergers and acquisitions (M&A) are often cited as pivotal moments in corporate s
 
 ### 3.1 Data Sources
 
-- **Acquisitions**: Acquisition name, date, country, original & inflation-adjusted price, parent division, source reference.
+- **Acquisitions**: Acquisition name, date, country, original & inflation adjusted price, parent division, source reference.
 - **Revenue**: Annual consolidated revenue, 2009–2024, in millions USD.
 
 ### 3.2 Database Design
@@ -125,17 +125,17 @@ Applied CTEs and window functions (`LAG()`, `SUM() OVER`) to compute year-over-y
 | 2023 | 88,898           | +7.47            |
 | 2024 | 91,361           | +2.77            |
 
-2020's decline (pandemic-driven park and theatrical closures) is the largest single-year drop in the dataset, followed by the largest single-year rebound in 2022. Both are far larger in magnitude than the more gradual growth seen around the Pixar/Marvel/Lucasfilm deals.
+2020's decline (pandemic driven park and theatrical closures) is the largest single year drop in the dataset, followed by the largest single year rebound in 2022. Both are far larger in magnitude than the more gradual growth seen around the Pixar/Marvel/Lucasfilm deals.
 
 ---
 
 ## 6. Discussion
 
 **2020–2022 is dominated by COVID-19, not M&A synergy.**
-The steep 2020 decline and the 2022 rebound line up closely with pandemic closures and reopening of parks, cruises, and theatrical releases — not with the timing of the Fox acquisition itself (completed March 2019, a full year before the decline). This dataset cannot separate a "Fox integration" effect from a "pandemic recovery" effect, since both occurred in the same window. A fair reading is: the data is *consistent with* continued post-Fox integration, but the pandemic is the more parsimonious explanation for the shape of the 2020–2022 swing specifically.
+The steep 2020 decline and the 2022 rebound line up closely with pandemic closures and reopening of parks, cruises, and theatrical releases not with the timing of the Fox acquisition itself (completed March 2019, a full year before the decline). This dataset cannot separate a "Fox integration" effect from a "pandemic recovery" effect, since both occurred in the same window. A fair reading is: the data is *consistent with* continued post Fox integration, but the pandemic is the more parsimonious explanation for the shape of the 2020–2022 swing specifically.
 
-**Content-led growth (Pixar, Marvel, Lucasfilm) shows a steadier pattern.**
-The 2010–2019 period shows consistent mid-to-high single-digit growth, with no single year standing out sharply around the Pixar (2006), Marvel (2009), or Lucasfilm (2012) deals individually — consistent with these being smaller, more gradually integrated acquisitions relative to Fox.
+**Content led growth (Pixar, Marvel, Lucasfilm) shows a steadier pattern.**
+The 2010–2019 period shows consistent mid-to-high single-digit growth, with no single year standing out sharply around the Pixar (2006), Marvel (2009), or Lucasfilm (2012) deals individually consistent with these being smaller, more gradually integrated acquisitions relative to Fox.
 
 **Methodological limitations:**
 - No control group (e.g., industry-wide media revenue) to separate acquisition effects from broader market trends.
@@ -146,7 +146,7 @@ The 2010–2019 period shows consistent mid-to-high single-digit growth, with no
 
 ## 7. Conclusion
 
-This project demonstrates SQL techniques — schema design, validation, window functions, and CTEs — applied to a small acquisitions-and-revenue dataset. It surfaces a clear, well-documented revenue trend from 2009–2024, including the 2020 pandemic-driven dip and 2022 rebound, but stops short of establishing that any single acquisition *caused* a given change in revenue. That would require the extensions noted below.
+This project demonstrates SQL techniques schema design, validation, window functions, and CTEs applied to a small acquisitions-and-revenue dataset. It surfaces a clear, well-documented revenue trend from 2009–2024, including the 2020 pandemic-driven dip and 2022 rebound, but stops short of establishing that any single acquisition *caused* a given change in revenue. That would require the extensions noted below.
 
 ---
 
@@ -154,7 +154,7 @@ This project demonstrates SQL techniques — schema design, validation, window f
 
 1. **Extend revenue history back to 1957** so all acquisitions can be evaluated against a "before" baseline, not just Marvel/Lucasfilm/Fox.
 2. **Add a control series** (e.g., broader media/entertainment industry revenue index) to separate acquisition effects from macro trends like COVID-19.
-3. **Statistical significance testing** (e.g., difference-in-differences, regression discontinuity) rather than eyeballing growth-rate tables.
+3. **Statistical significance testing** (e.g., difference-in-differences, regression discontinuity) rather than eyeballing growth rate tables.
 4. **Interactive dashboards** in Tableau/Power BI for exploring acquisition timing against revenue interactively.
 
 ---
