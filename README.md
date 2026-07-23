@@ -1,3 +1,5 @@
+<img width="681" height="383" alt="image"  src="https://github.com/user-attachments/assets/5f2982fc-bf08-4c60-b823-28c08e02e5e5"  / >
+
 # Disney Acquisitions & Revenue Analysis
 
 **A SQL-Based Exploration of Disney's Major Acquisitions and Reported Revenue (1957–2024)**
