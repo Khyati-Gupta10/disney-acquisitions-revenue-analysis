@@ -1,25 +1,34 @@
 -- Create the Database --
+
 DROP DATABASE IF EXISTS disney_analysis;
 CREATE DATABASE disney_analysis;
 USE disney_analysis;
--- Create Tables--
--- Acquisitions Table --
+
+-- Create Tables --
+
+-- Acquisitions Table
+-- NOTE: price and price_adjusted are stored in RAW USD (not millions),
+-- while revenue.revenue is stored in MILLIONS USD. Do not compare the two
+-- columns directly without converting units.
 CREATE TABLE acquisitions (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    company_acquired VARCHAR(255),
-    date DATE,
-    country VARCHAR(255),
-    price DECIMAL(15, 2),
-    price_adjusted DECIMAL(15, 2),
-    parent_merged_with VARCHAR(255),
-    reference  VARCHAR(255)
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  company_acquired VARCHAR(255),
+  date DATE,
+  country VARCHAR(255),
+  price DECIMAL(15, 2),          -- raw USD
+  price_adjusted DECIMAL(15, 2), -- raw USD, inflation-adjusted
+  parent_merged_with VARCHAR(255),
+  reference VARCHAR(255)
 );
+
 -- Revenue Table
 CREATE TABLE revenue (
-    year INT PRIMARY KEY,
-    revenue DECIMAL(15, 2)
+  year INT PRIMARY KEY,
+  revenue DECIMAL(15, 2) -- millions USD
 );
+
 -- Step 3: Insert Sample Data
+
 -- Insert Acquisitions Data
 INSERT INTO acquisitions (company_acquired, date, country, price, price_adjusted, parent_merged_with, reference)
 VALUES
@@ -32,6 +41,10 @@ VALUES
 ('21st Century Fox', '2019-03-20', 'USA', 71300000000, 87689000000, 'The Walt Disney Company', '[36],[37]');
 
 -- Insert Revenue Data (in millions USD)
+-- NOTE: Revenue history only goes back to 2009. This means acquisitions before
+-- 2009 (Disneyland x2, Capital Cities/ABC, Pixar) cannot be directly compared
+-- against revenue trend data with this table alone. See Query 7 for how this
+-- limitation is handled.
 INSERT INTO revenue (year, revenue)
 VALUES
 (2009, 36149),
@@ -45,13 +58,14 @@ VALUES
 (2017, 55137),
 (2018, 59434),
 (2019, 69607),
-(2020, 65388),
+(2020, 65388), -- COVID-19 impact: revenue declined vs. 2019
 (2021, 67418),
 (2022, 82722),
 (2023, 88898),
 (2024, 91361);
 
 -- Step 4: Data Validation
+
 -- Check for duplicate years in revenue
 SELECT year, COUNT(*) AS count
 FROM revenue
@@ -72,9 +86,16 @@ FROM acquisitions
 GROUP BY YEAR(date)
 ORDER BY year;
 
--- Query 3: Revenue trend with year-over-year growth rate
-SELECT year, revenue,
-       (revenue - LAG(revenue) OVER (ORDER BY year)) / LAG(revenue) OVER (ORDER BY year) AS growth_rate
+-- Query 3: Revenue trend with year-over-year growth rate (FIXED: now returns
+-- an actual percentage, rounded to 2 decimal places, instead of a raw
+-- decimal fraction like 0.0310)
+SELECT
+  year,
+  revenue,
+  ROUND(
+    (revenue - LAG(revenue) OVER (ORDER BY year))
+    / LAG(revenue) OVER (ORDER BY year) * 100,
+  2) AS growth_rate_pct
 FROM revenue
 ORDER BY year;
 
@@ -87,29 +108,52 @@ SELECT SUM(revenue) AS total_revenue_after
 FROM revenue
 WHERE year >= 2019;
 
--- Query 5: Revenue for major acquisitions (price_adjusted > $1 billion)
+-- Query 5: Major acquisitions (price_adjusted > $1 billion)
 SELECT company_acquired, date, price_adjusted
 FROM acquisitions
 WHERE price_adjusted > 1000000000
 ORDER BY date;
 
--- Query 6: Revenue in the year of and year after major acquisitions (example for 21st Century Fox)
+-- Query 6: Revenue in the year of and year after major acquisitions
+-- (example for 21st Century Fox, 2019). Note: also compare against the
+-- broader 2010-2018 average growth rate before concluding an acquisition
+-- caused a change -- 2020 was a pandemic year and should not be read in
+-- isolation as an acquisition effect.
 SELECT r.year, r.revenue
 FROM revenue r
-WHERE r.year IN (2019, 2020);
+WHERE r.year IN (2019, 2020, 2021)
+ORDER BY r.year;
 
--- Query 7: Cumulative acquisitions vs. revenue
-WITH cumulative_acquisitions AS (
-    SELECT YEAR(date) AS year, COUNT(*) AS num_acquisitions
-    FROM acquisitions
-    GROUP BY YEAR(date)
+-- Query 7: Cumulative acquisitions vs. cumulative revenue
+-- FIXED: previous version's "cumulative_acquisitions" CTE only counted
+-- acquisitions per year -- it was not actually cumulative. This version
+-- computes a true running total via SUM() OVER (ORDER BY year).
+-- LIMITATION: acquisitions span 1957-2019, but revenue data only starts in
+-- 2009, so cumulative_revenue will be NULL for acquisition years before 2009
+-- (Disneyland x2, Capital Cities/ABC, Pixar). This is a data-availability
+-- gap, not a query bug -- extend the revenue table back to 1957 to close it.
+WITH acquisitions_per_year AS (
+  SELECT YEAR(date) AS year, COUNT(*) AS num_acquisitions
+  FROM acquisitions
+  GROUP BY YEAR(date)
+),
+cumulative_acquisitions AS (
+  SELECT
+    year,
+    SUM(num_acquisitions) OVER (ORDER BY year) AS cum_acquisitions
+  FROM acquisitions_per_year
 ),
 cumulative_revenue AS (
-    SELECT year, revenue,
-           SUM(revenue) OVER (ORDER BY year) AS cumulative_revenue
-    FROM revenue
+  SELECT
+    year,
+    revenue,
+    SUM(revenue) OVER (ORDER BY year) AS cum_revenue
+  FROM revenue
 )
-SELECT ca.year, ca.num_acquisitions, cr.cumulative_revenue
+SELECT
+  ca.year,
+  ca.cum_acquisitions,
+  cr.cum_revenue
 FROM cumulative_acquisitions ca
 LEFT JOIN cumulative_revenue cr ON ca.year = cr.year
 ORDER BY ca.year;
