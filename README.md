@@ -1,4 +1,4 @@
-<img width="681" height="383" alt="image"  src="https://github.com/user-attachments/assets/5f2982fc-bf08-4c60-b823-28c08e02e5e5"  / >
+<img width="681" height="383" alt="image" src="https://github.com/user-attachments/assets/c0c77840-c542-4e31-8766-9fa2091b3bef" />
 
 # Disney Acquisitions & Revenue Analysis
 
